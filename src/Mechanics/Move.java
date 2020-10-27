@@ -24,6 +24,7 @@ public class Move {
         this.destCol = to.getValue();
         this.score = 0;
     }
+
     public Move(Move move) {
         this.moveBy = move.moveBy;
         this.srcRow = move.srcRow;
