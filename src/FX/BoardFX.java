@@ -21,7 +21,7 @@ public class BoardFX {
     Board board;
     int dim;
 
-    int state = 0; //0 means src to be selected, 1 means dst to be selected
+    int state = 0; //0 means src to be selected, 1 means dst to be selected, 2 means ai to move, 3 means game over
 
     List<Pair<Integer, Integer>> moves; //list of available moves when state = 1
     List<Line> srcLines; //list of current lines, when state = 1
@@ -115,7 +115,7 @@ public class BoardFX {
         root.getChildren().add(destLine);
 
         if (board.getResult() != 0) {
-            this.state = 2; //game over
+            this.state = 3; //game over
             gameStatus.setFont(Font.font(25));
             gameStatus.setText((board.moveOf == board.BLACK ? "White" : "Black") + " won!!!!");
             gameStatus.setFill(Color.RED);
