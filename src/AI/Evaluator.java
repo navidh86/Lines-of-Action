@@ -3,7 +3,7 @@ package AI;
 import Mechanics.Board;
 
 public class Evaluator {
-    public final static double INF = 100000;
+    private final static double INF = 100000;
     private double mc, cc, dc, pc, qc, ac;
     private Board board;
     private int dim;

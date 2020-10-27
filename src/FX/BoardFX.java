@@ -25,6 +25,9 @@ public class BoardFX {
     Main main;
     int dim;
 
+    double baseX, baseY; //base of every other coordinate
+    int size = 100; //size of cells
+
     int type; //single or multi
     int playerColor; //in singleplayer
 
@@ -38,7 +41,7 @@ public class BoardFX {
 
     Button back;
 
-    Text gameStatus;
+    Text gameStatus, aiStatus;
     List<Text> labels;
 
     AI ai;
@@ -49,6 +52,9 @@ public class BoardFX {
         this.board = new Board(dim);
         this.dim = dim;
         this.playerColor = color;
+
+        this.baseX = dim == 8 ? 270 : 370;
+        this.baseY = dim == 8 ? 800 : 700;
 
         root = new Group();
 
@@ -64,14 +70,14 @@ public class BoardFX {
 
         gameStatus = new Text();
         gameStatus.setText("Move of: Black");
-        gameStatus.setX(600);
-        gameStatus.setY(970);
+        gameStatus.setX(baseX + (dim/2 - 1) * size);
+        gameStatus.setY(baseY + 1.8 * size);
         gameStatus.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 26));
 
         back = new Button("Go back");
         back.setMinSize(80, 40);
-        back.setLayoutX(900);
-        back.setLayoutY(dim == 6 ? 100 : 10);
+        back.setLayoutX(baseX + dim * size + 50);
+        back.setLayoutY(baseY - dim * size + dim);
         back.setOnMouseClicked(e -> goBack());
 
         root.getChildren().addAll(gameStatus, back);
@@ -84,13 +90,25 @@ public class BoardFX {
         }
         else {
             ai = new AI(dim);
-            ai.setCoefficients(1, 0.1, 3, 10, 2, 2);
+            ai.setCoefficients(1, 0, 5, 10, 0, 1);
+            
+            aiStatus = new Text();
+            aiStatus.setText("Thinking.....");
+            aiStatus.setX(baseX - 2.5 * size);
+            aiStatus.setY(baseY - (dim / 2) * size);
+            aiStatus.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 26));
+            aiStatus.setFill(Color.WHITE);
+            aiStatus.setStroke(Color.BLACK);
+            aiStatus.setStrokeWidth(2);
+            aiStatus.setVisible(false);
+            root.getChildren().add(aiStatus);
 
             if (playerColor == Board.BLACK) {
                 state = 0;
             }
             else {
                 state = 2;
+                aiStatus.setVisible(true);
                 aiMove();
             }
         }
@@ -152,10 +170,16 @@ public class BoardFX {
 
         if (board.getResult() != 0) {
             this.state = 3; //game over
-            gameStatus.setFont(Font.font(35));
+            gameStatus.setFont(Font.font(50));
             gameStatus.setText((board.getResult() == board.BLACK ? "Black" : "White") + " won!!!!");
             gameStatus.setFill(Color.RED);
             gameStatus.setStroke(Color.BLACK);
+            gameStatus.setX(baseX + (dim/2 - 1) * size);
+            gameStatus.setY(baseY - (dim/2 - 1) * size);
+
+            if (type == Main.SINGLEPLAYER) {
+                aiStatus.setVisible(false);
+            }
         }
         else {
             gameStatus.setText("Move of: " + (board.moveOf == board.BLACK ? "Black" : "White"));
@@ -171,9 +195,13 @@ public class BoardFX {
                 System.out.println("state = " + state);
                 if (state != 2) {
                     state = 2;
+                    aiStatus.setVisible(true);
                     aiMove();
                 }
-                else state = 0;
+                else {
+                    state = 0;
+                    aiStatus.setVisible(false);
+                }
             }
         }
     }
@@ -184,8 +212,8 @@ public class BoardFX {
 
         //set cols
         char c = 'A';
-        int x = 340;
-        int y1 = (dim == 8 ? 80 : 280), y2 = 935;
+        double x = baseX + size / 2;
+        double y1 = baseY - (dim-1) * size - 25, y2 = baseY + size + 40;
 
         for (int i=0; i<dim; i++) {
             temp1 = new Text(); temp2 = new Text();
@@ -197,13 +225,13 @@ public class BoardFX {
             labels.add(temp1); labels.add(temp2);
             root.getChildren().addAll(temp1, temp2);
             c++;
-            x += 100;
+            x += size;
         }
 
         //set rows
         c = '1';
-        int x1 = 265, x2 = (dim == 8 ? 1130 : 930);
-        int y = 850;
+        double x1 = baseX - 40, x2 = baseX + dim * size + 35;
+        double y = baseY + (size/2);
 
         for (int i=0; i<dim; i++) {
             temp1 = new Text(); temp2 = new Text();
@@ -215,7 +243,7 @@ public class BoardFX {
             labels.add(temp1); labels.add(temp2);
             root.getChildren().addAll(temp1, temp2);
             c++;
-            y -= 100;
+            y -= size;
         }
     }
 

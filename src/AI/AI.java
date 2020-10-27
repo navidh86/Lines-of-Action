@@ -1,13 +1,13 @@
 package AI;
 
 import Mechanics.*;
-import javafx.util.Pair;
 
 import java.util.*;
 
 public class AI {
     public final static double INF = 100000;
     private final double eps = .00001;
+    double scoreCutOff = INF / 2;
 
     int dim;
     int currentDepth;
@@ -15,7 +15,6 @@ public class AI {
     double timeLimit, startTime;
     Evaluator evaluator;
     boolean timeUp = false;
-    double scoreCutOff = INF / 2;
 
     double nodesVisited;
 
@@ -23,7 +22,7 @@ public class AI {
 
     public AI(int dim) {
         this.dim = dim;
-        this.timeLimit = (dim == 8 ? 2000: 1000);
+        this.timeLimit = (dim == 8 ? 1999: 999);
         this.currentDepth = 0;
         this.maxDepth = 10;
         this.evaluator = new Evaluator(dim);
@@ -42,12 +41,12 @@ public class AI {
         nodesVisited++;
 
         if (score == INF)
-            return INF - depth;
+            return INF + depth;
         else if (score == -INF)
-            return -INF + depth;
-        else if(depth == 0)
+            return -INF - depth;
+        else if (depth == 0)
             return score;
-        else if(System.currentTimeMillis()-startTime > timeLimit) {
+        else if (System.currentTimeMillis()-startTime > timeLimit) {
             timeUp = true;
             return score;
         }
@@ -58,6 +57,7 @@ public class AI {
         List<Move> moveList = board.getAllAvailableMoves(board.moveOf);
 
         if (board.moveOf == color) {
+            //maximize
             score = -2 * INF;
 
             for (int i=0; i<moveList.size(); i++) {
@@ -81,6 +81,7 @@ public class AI {
             }
         }
         else {
+            //minimize
             score = 2 * INF;
 
             for (int i=0; i<moveList.size(); i++) {
@@ -129,13 +130,12 @@ public class AI {
             score = -2 * INF;
 
             for (int i=0; i<moveList.size(); i++) {
-                Move m = moveList.get(i);
-
                 if (System.currentTimeMillis()-startTime > timeLimit) {
                     timeUp = true;
                     break;
                 }
 
+                Move m = moveList.get(i);
                 temp = new Board(board);
                 temp.move(m);
 
@@ -164,6 +164,7 @@ public class AI {
             else {
                 System.out.println("Time up before ending: " + currentDepth);
                 if (bestCurrent.getscore() > scoreCutOff) {
+                    completedDepth++;
                     bestAllTime = bestCurrent;
                 }
             }

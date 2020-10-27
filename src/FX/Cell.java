@@ -10,10 +10,11 @@ public class Cell {
     final static int BLACK = 1;
     final static int WHITE = 2;
 
-    static int xOffset = 300, yOffset = 800;
+    static double xOffset, yOffset;
 
     int size = 100;
-    int row, col, x, y;
+    int row, col;
+    double x, y;
     int val; //1 black, 2 white
 
     Circle circle;
@@ -26,6 +27,9 @@ public class Cell {
 
     Cell(int row, int col, BoardFX parent) {
         this.parent = parent;
+
+        xOffset = parent.baseX;
+        yOffset = parent.baseY;
 
         this.row = row;
         this.col = col;
