@@ -109,7 +109,7 @@ public class AI {
     }
 
     public Move getMove(Board board) {
-        Move bestCurrent = null, bestAllTime = null;
+        Move best = null;
         double score;
         int color = board.moveOf;
 
@@ -141,43 +141,41 @@ public class AI {
 
                 double score2 = minimax(temp, color, currentDepth - 1, -INF, INF);
 
+                if (timeUp) break;
+
                 //save the score
                 m.setScore(score2);
 
                 if (score2 > score) {
                     score = score2;
-                    bestCurrent = m;
+                    best = m;
                 }
                 else if (Math.abs(score2 - score) < eps) {
                     if (random.nextBoolean()) {
                         score = score2;
-                        bestCurrent = m;
+                        best = m;
                     }
                 }
             }
 
             if (!timeUp) {
-                completedDepth = currentDepth;
-                bestAllTime = new Move(bestCurrent);
-                System.out.println("At depth: " + currentDepth + ", Score: " + bestCurrent.getscore());
+                System.out.println("At depth: " + currentDepth + ", Score: " + best.getscore());
             }
             else {
                 System.out.println("Time up before ending: " + currentDepth);
-                if (bestCurrent.getscore() > scoreCutOff) {
-                    completedDepth++;
-                    bestAllTime = bestCurrent;
-                }
             }
 
-            if (bestAllTime.getscore() > scoreCutOff) break;
+            completedDepth = currentDepth;
+
+            if (best.getscore() > scoreCutOff) break;
 
             Collections.sort(moveList, moveComparator);
         }
 
-        System.out.println("Found at " + completedDepth + " score: " + bestAllTime.getscore());
+        System.out.println("Found at " + completedDepth + " score: " + best.getscore());
         System.out.println("Time needed: " + (System.currentTimeMillis()-startTime));
         System.out.println("Nodes visited: " + nodesVisited);
 
-        return bestAllTime;
+        return best;
     }
 }
