@@ -1,10 +1,9 @@
-package sample;
+package FX;
 
-import javafx.event.EventHandler;
+import Mechanics.Board;
+import Mechanics.Move;
 import javafx.scene.Group;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -21,6 +20,9 @@ public class BoardFX {
     Board board;
     int dim;
 
+    int type; //single or multi
+    int playerColor; //in singleplayer
+
     int state = 0; //0 means src to be selected, 1 means dst to be selected, 2 means ai to move, 3 means game over
 
     List<Pair<Integer, Integer>> moves; //list of available moves when state = 1
@@ -32,9 +34,11 @@ public class BoardFX {
     Text gameStatus;
     List<Text> labels;
 
-    public BoardFX(Board board) {
-        this.board = board;
-        this.dim = board.dim;
+    public BoardFX(int type, int dim, int color) {
+        this.type = type;
+        this.board = new Board(dim);
+        this.dim = dim;
+        this.playerColor = color;
 
         root = new Group();
 
@@ -197,5 +201,9 @@ public class BoardFX {
                 cells[i][j].setVal(board.board[i][j]);
             }
         }
+    }
+
+    public Group getRoot() {
+        return this.root;
     }
 }

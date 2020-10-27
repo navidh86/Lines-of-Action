@@ -1,4 +1,4 @@
-package sample;
+package Mechanics;
 
 import javafx.util.Pair;
 
@@ -9,8 +9,8 @@ public class Board {
     public static final int BLACK = 1;
     public static final int WHITE = 2;
 
-    int[][] board; //0 means empty, 1 means black, 2 means white
-    int moveOf;
+    public int[][] board; //0 means empty, 1 means black, 2 means white
+    public int moveOf;
     int dim;
     int moveCount;
     int[] pieceCount, rowCount, colCount, rdiagCount, ldiagCount;
@@ -238,7 +238,7 @@ public class Board {
         return ret;
     }
 
-    int getResult() {
+    public int getResult() {
         //0 means game not over yet
         int result = 0;
         //check for black first
@@ -296,7 +296,7 @@ public class Board {
         return (cnt == 1);
     }
 
-    List<Pair<Integer, Integer>> getAvailableMoves(int row, int col) {
+    public List<Pair<Integer, Integer>> getAvailableMoves(int row, int col) {
         List<Pair<Integer, Integer>> ret = new ArrayList<>();
 
         int color = board[row][col];
@@ -423,7 +423,7 @@ public class Board {
         return ret;
     }
 
-    List<String> getAvailableMovesString(String cell) {
+    public List<String> getAvailableMovesString(String cell) {
         List<Pair<Integer, Integer>> temp = getAvailableMoves(cell.charAt(1)-'1', cell.charAt(0)-'A');
         List<String> ret = new ArrayList<>();
 
@@ -434,7 +434,7 @@ public class Board {
         return ret;
     }
 
-    List<Move> getAllAvailableMoves(int color) {
+    public List<Move> getAllAvailableMoves(int color) {
         //list of all available moves for pieces of specified color
         List<Move> ret = new ArrayList<>();
         List<Pair<Integer, Integer>> temp;
@@ -453,6 +453,14 @@ public class Board {
         }
 
         return ret;
+    }
+
+    public int getDim() {
+        return dim;
+    }
+
+    public int[][] getBoard() {
+        return board;
     }
 
     public void printBoard() {

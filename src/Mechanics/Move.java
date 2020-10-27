@@ -1,4 +1,4 @@
-package sample;
+package Mechanics;
 
 import javafx.util.Pair;
 
@@ -8,7 +8,7 @@ public class Move {
     int srcRow, srcCol, destRow, destCol, moveBy;
     int score = 0;
 
-    Move(int moveBy, String from, String to) {
+    public Move(int moveBy, String from, String to) {
         this.moveBy = moveBy;
         this.srcRow = from.charAt(1) - '1';
         this.srcCol = from.charAt(0) - 'A';
@@ -16,7 +16,7 @@ public class Move {
         this.destCol = to.charAt(0) - 'A';
     }
 
-    Move(int moveBy, Pair<Integer, Integer> from, Pair<Integer, Integer> to) {
+    public Move(int moveBy, Pair<Integer, Integer> from, Pair<Integer, Integer> to) {
         this.moveBy = moveBy;
         this.srcRow = from.getKey();
         this.srcCol = from.getValue();
