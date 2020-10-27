@@ -1,13 +1,10 @@
 package Main;
 
-import Mechanics.Board;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import FX.*;
-
-import java.awt.*;
 
 public class Main extends Application {
     final int NUMBER_OF_SCENES = 4;
@@ -26,24 +23,30 @@ public class Main extends Application {
     int color = BLACK;
 
     Scene[] scenes;
+    BoardFX bfx;
 
     Stage primaryStage;
 
-    private void showScene(int type) {
-        if (type != MAIN_GAME) {
-            if (scenes[type] == null) {
-                scenes[type] = new Scene(new ChoiceScreen(type, this).getRoot(), 1300, 1000);
+    private void showScene(int screenIdx) {
+        if (screenIdx != MAIN_GAME) {
+            if (scenes[screenIdx] == null) {
+                scenes[screenIdx] = new Scene(new ChoiceScreen(screenIdx, this).getRoot(), 1300, 1000);
             }
         }
         else {
-            scenes[type] = new Scene(new BoardFX(type, size, color).getRoot(), 1300, 1000);
+            bfx = new BoardFX(type, size, color, this);
+            scenes[screenIdx] = new Scene(bfx.getRoot(), 1300, 1000);
         }
 
-        scenes[type].setFill(Color.rgb(90, 120, 70));
+        scenes[screenIdx].setFill(Color.rgb(90, 120, 70));
 
         primaryStage.setTitle("LOA");
-        primaryStage.setScene(scenes[type]);
+        primaryStage.setScene(scenes[screenIdx]);
         primaryStage.show();
+    }
+
+    public void goBack(int type) {
+        showScene(type - 1);
     }
 
     public void setSize(int size) {
@@ -76,20 +79,6 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
 
         showScene(CHOOSE_TYPE);
-
-        //showScene(CHOOSE_TYPE);
-
-        //BoardFX boardFX = new BoardFX(new Board(6));
-        //ChoiceScreen cs = new ChoiceScreen(CHOOSE_SIZE, this);
-
-        //Scene scene = new Scene(cs.getRoot(), 1300, 1000);
-        //Scene scene = new Scene(boardFX.getRoot(), 1300, 1000);
-        //scene.setFill(Color.rgb(90, 120, 70));
-
-
-//        primaryStage.setTitle("LOA");
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
     }
 
 

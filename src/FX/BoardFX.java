@@ -2,7 +2,9 @@ package FX;
 
 import Mechanics.Board;
 import Mechanics.Move;
+import javafx.application.Platform;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
@@ -10,6 +12,8 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
+import Main.Main;
+import AI.AI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,7 @@ public class BoardFX {
     Group root;
     Cell[][] cells;
     Board board;
+    Main main;
     int dim;
 
     int type; //single or multi
@@ -31,10 +36,15 @@ public class BoardFX {
 
     Pair<Integer, Integer> from;
 
+    Button back;
+
     Text gameStatus;
     List<Text> labels;
 
-    public BoardFX(int type, int dim, int color) {
+    AI ai;
+
+    public BoardFX(int type, int dim, int color, Main main) {
+        this.main = main;
         this.type = type;
         this.board = new Board(dim);
         this.dim = dim;
@@ -52,18 +62,38 @@ public class BoardFX {
             }
         }
 
-        state = 0;
-
         gameStatus = new Text();
         gameStatus.setText("Move of: Black");
         gameStatus.setX(600);
         gameStatus.setY(970);
         gameStatus.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 26));
 
-        root.getChildren().add(gameStatus);
+        back = new Button("Go back");
+        back.setMinSize(80, 40);
+        back.setLayoutX(900);
+        back.setLayoutY(dim == 6 ? 100 : 10);
+        back.setOnMouseClicked(e -> goBack());
+
+        root.getChildren().addAll(gameStatus, back);
 
         setUpLabels();
         loadBoard();
+
+        if (type == Main.MULTIPLAYER) {
+            state = 0;
+        }
+        else {
+            ai = new AI(dim);
+            ai.setCoefficients(1, 0.1, 3, 10, 2, 2);
+
+            if (playerColor == Board.BLACK) {
+                state = 0;
+            }
+            else {
+                state = 2;
+                aiMove();
+            }
+        }
     }
 
     public void setFrom(int row, int col) {
@@ -136,6 +166,15 @@ public class BoardFX {
                 gameStatus.setFill(Color.WHITE);
                 gameStatus.setStroke(Color.BLACK);
             }
+
+            if (type == Main.SINGLEPLAYER) {
+                System.out.println("state = " + state);
+                if (state != 2) {
+                    state = 2;
+                    aiMove();
+                }
+                else state = 0;
+            }
         }
     }
 
@@ -194,6 +233,19 @@ public class BoardFX {
                 root.getChildren().remove(srcLines.get(i));
             }
         }
+    }
+
+    public void aiMove() {
+        new Thread(() -> {
+            Move move = ai.getMove(board);
+            from = new Pair<>(move.srcRow, move.srcCol);
+
+            Platform.runLater(() -> move(move.destRow, move.destCol));
+        }).start();
+    }
+
+    private void goBack() {
+        main.goBack(1);
     }
 
     public void loadBoard() {

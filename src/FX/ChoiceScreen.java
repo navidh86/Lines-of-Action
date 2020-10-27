@@ -13,7 +13,7 @@ import javafx.scene.text.Text;
 public class ChoiceScreen {
     Group root;
     Main main;
-    Button choice1, choice2;
+    Button choice1, choice2, back;
     Text text;
     int type;
 
@@ -59,25 +59,32 @@ public class ChoiceScreen {
         choice1.setLayoutY(400);
         choice2.setLayoutY(550);
 
-        choice1.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                choose(1);
-            }
-        });
+        back = new Button("Go back");
+        back.setMinSize(80, 40);
+        back.setLayoutX(800);
+        back.setLayoutY(200);
 
-        choice2.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                choose(2);
-            }
-        });
+        if (type == Main.CHOOSE_TYPE) {
+            //nowhere to go back to
+            back.setDisable(true);
+            back.setVisible(false);
+        }
 
-        root.getChildren().addAll(choice1, choice2);
+        back.setOnMouseClicked(e -> goBack());
+
+        choice1.setOnMouseClicked(e ->choose(1));
+
+        choice2.setOnMouseClicked(e -> choose(2));
+
+        root.getChildren().addAll(choice1, choice2, back);
     }
 
     public Group getRoot() {
         return this.root;
+    }
+
+    private void goBack() {
+        main.goBack(type);
     }
 
     private void choose(int choice) {

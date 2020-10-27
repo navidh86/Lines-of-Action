@@ -13,8 +13,8 @@ public class Board {
     public int moveOf;
     int dim;
     int moveCount;
-    int[] pieceCount, rowCount, colCount, rdiagCount, ldiagCount;
-    double[][] centerOfMass;
+    public int[] pieceCount, rowCount, colCount, rdiagCount, ldiagCount;
+    public double[][] centerOfMass;
 
     //zobrist hashing
     int[][][] keys = null;

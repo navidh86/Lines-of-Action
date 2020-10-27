@@ -1,7 +1,5 @@
 package FX;
 
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -67,12 +65,7 @@ public class Cell {
         }
         sp.getChildren().add(rectangle);
 
-        sp.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                handleClick();
-            }
-        });
+        sp.setOnMouseClicked(e -> handleClick());
     }
 
     public void createCircle() {
@@ -108,7 +101,6 @@ public class Cell {
             if (val == parent.board.moveOf) {
                 parent.setState(1);
                 parent.setFrom(row, col);
-                //circle.setStroke(Color.RED);
             }
         }
         else if (parent.state == 1 && state == 1) {

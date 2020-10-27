@@ -5,8 +5,8 @@ import javafx.util.Pair;
 import java.util.Comparator;
 
 public class Move {
-    int srcRow, srcCol, destRow, destCol, moveBy;
-    int score = 0;
+    public int srcRow, srcCol, destRow, destCol, moveBy;
+    double score = 0;
 
     public Move(int moveBy, String from, String to) {
         this.moveBy = moveBy;
@@ -24,18 +24,24 @@ public class Move {
         this.destCol = to.getValue();
         this.score = 0;
     }
+    public Move(Move move) {
+        this.moveBy = move.moveBy;
+        this.srcRow = move.srcRow;
+        this.srcCol = move.srcCol;
+        this.destRow = move.destRow;
+        this.destCol = move.destCol;
+        this.score = move.score;
+    }
 
     public void setScore(double s) {
-        this.score = (int) s;
+        this.score = s;
+    }
+
+    public double getscore() {
+        return score;
     }
 
     public String toString() {
         return (moveBy == 1 ? "Black" : "White") + " chose (" + Board.getCell(srcRow, srcCol) + ") to (" + Board.getCell(destRow, destCol) + ")";
-    }
-}
-
-class MoveComparator implements Comparator<Move> {
-    public int compare(Move m1, Move m2) {
-        return (m2.score - m1.score);
     }
 }
