@@ -58,7 +58,7 @@ public class BoardFX {
         gameStatus.setText("Move of: Black");
         gameStatus.setX(600);
         gameStatus.setY(970);
-        gameStatus.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 16));
+        gameStatus.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 26));
 
         root.getChildren().add(gameStatus);
 
@@ -122,16 +122,15 @@ public class BoardFX {
 
         if (board.getResult() != 0) {
             this.state = 3; //game over
-            gameStatus.setFont(Font.font(25));
-            gameStatus.setText((board.moveOf == board.BLACK ? "White" : "Black") + " won!!!!");
+            gameStatus.setFont(Font.font(35));
+            gameStatus.setText((board.getResult() == board.BLACK ? "Black" : "White") + " won!!!!");
             gameStatus.setFill(Color.RED);
-            gameStatus.setStroke(Color.WHITE);
+            gameStatus.setStroke(Color.BLACK);
         }
         else {
             gameStatus.setText("Move of: " + (board.moveOf == board.BLACK ? "Black" : "White"));
             if (board.moveOf == board.BLACK) {
                 gameStatus.setFill(Color.BLACK);
-                gameStatus.setStroke(Color.WHITE);
             }
             else {
                 gameStatus.setFill(Color.WHITE);
