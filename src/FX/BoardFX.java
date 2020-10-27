@@ -89,6 +89,7 @@ public class BoardFX {
             temp.setEndY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + 50);
             temp.setStrokeWidth(4);
             temp.setStroke(Color.RED);
+            temp.setMouseTransparent(true);
             srcLines.add(temp);
             root.getChildren().add(temp);
 
@@ -116,6 +117,7 @@ public class BoardFX {
         destLine.setEndY(cells[destRow][destCol].y + 50);
         destLine.setStrokeWidth(3);
         destLine.setStroke(Color.BLUE);
+        destLine.setMouseTransparent(true);
         root.getChildren().add(destLine);
 
         if (board.getResult() != 0) {
