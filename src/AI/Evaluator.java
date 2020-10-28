@@ -2,21 +2,18 @@ package AI;
 
 import Mechanics.Board;
 
-public class Evaluator {
+class Evaluator {
     private final static double INF = 100000;
     private double mc, cc, dc, pc, qc, ac;
     private Board board;
     private int dim;
 
-    private double[][] pst;
-
-    public Evaluator(int dim) {
+    Evaluator(int dim) {
         this.dim = dim;
-        setPst(dim);
         mc = cc = dc = pc = qc = ac = 1.0;
     }
 
-    public void setCoefficients(double pc, double ac, double mc, double cc, double qc, double dc) {
+    void setCoefficients(double pc, double ac, double mc, double cc, double qc, double dc) {
         this.mc = mc;
         this.cc = cc;
         this.dc = dc;
@@ -25,47 +22,9 @@ public class Evaluator {
         this.ac = ac;
     }
 
-    private void setPst(int dim) {
-        if (dim == 8) {
-            double[][] temp = {
-                    {-80, -25, -20, -20, -20, -20, -25, -80},
-                    {-25,  10,  10,  10,  10,  10,  10, -25},
-                    {-20,  10,  25,  25,  25,  25,  10, -20},
-                    {-20,  10,  25,  50,  50,  25,  10, -20},
-                    {-20,  10,  25,  50,  50,  25,  10, -20},
-                    {-20,  10,  25,  25,  25,  25,  10, -20},
-                    {-25,  10,  10,  10,  10,  10,  10, -25},
-                    {-80, -25, -20, -20, -20, -20, -25, -80}
-            };
-            pst = temp;
-        }
-        else if (dim == 6) {
-            double[][] temp = {
-                    {-40, -20,  -5,  -5, -20, -40},
-                    {-20,  10,  10,  10,  10, -20},
-                    { -5,  10,  25,  25,  10,  -5},
-                    { -5,  10,  25,  25,  10,  -5},
-                    {-20,  10,  10,  10,  10, -20},
-                    {-40, -20,  -5,  -5, -20, -40}
-            };
-            pst = temp;
-        }
-    }
-
     //calculate score from position of pieces using the pst
     private double getPositionScore() {
-        //normalized
-        double[] score = new double[3];
-
-        for (int i=0; i<dim; i++) {
-            for (int j=0; j<dim; j++) {
-                if (board.board[i][j] != Board.EMPTY) {
-                    score[board.board[i][j]] += pst[i][j];
-                }
-            }
-        }
-
-        return (1.0 * score[Board.BLACK]) / board.pieceCount[Board.BLACK] - (1.0 * score[Board.WHITE]) / board.pieceCount[Board.WHITE];
+        return board.positionalScores[Board.BLACK] / board.pieceCount[Board.BLACK] - board.positionalScores[Board.WHITE] / board.pieceCount[Board.WHITE];
     }
 
     //calculate score from area, smaller area better
@@ -98,9 +57,8 @@ public class Evaluator {
 
     //sum of available move count of all pieces
     private double getMobilityScore() {
-        //normailzed
-        double blackMoves = (1.0 * board.getAllAvailableMoves(Board.BLACK).size()) / board.pieceCount[Board.BLACK];
-        double whiteMoves = (1.0 * board.getAllAvailableMoves(Board.WHITE).size()) / board.pieceCount[Board.WHITE];
+        double blackMoves = board.getAllAvailableMoves(Board.BLACK).size();
+        double whiteMoves = board.getAllAvailableMoves(Board.WHITE).size();
 
         return blackMoves - whiteMoves;
     }
@@ -132,25 +90,50 @@ public class Evaluator {
     }
 
     //quad score
-    double getQuadScore() {
+    private double getQuadScore() {
         int blackQuadScore = 0, whiteQuadScore = 0;
-        
         int[] temp;
-        for (int i=0; i<dim-1; i++) {
-            for (int j=0; j<dim-1; j++) {
+
+        //black first
+        int iStart = (int) Math.max(0, board.centerOfMass[Board.BLACK][0] - 2),
+                iEnd = (int) Math.min(dim-2, board.centerOfMass[Board.BLACK][0] + 2),
+                jStart = (int) Math.max(0, board.centerOfMass[Board.BLACK][1] - 2),
+                jEnd = (int) Math.min(dim-2, board.centerOfMass[Board.BLACK][1] + 2);
+
+        for (int i=iStart; i<=iEnd; i++) {
+            for (int j=jStart; j<=jEnd; j++) {
                 temp = new int[3];
-                
+
                 //count the number of pieces of each type in the quad starting from (i, j) and ending in (i+1, j+1)
                 temp[board.board[i][j]]++;
                 temp[board.board[i+1][j]]++;
                 temp[board.board[i][j+1]]++;
                 temp[board.board[i+1][j+1]]++;
-                
+
                 if (temp[Board.BLACK] >= 3) {
-                    blackQuadScore += temp[Board.BLACK];
+                    blackQuadScore++;
                 }
-                else if (temp[Board.WHITE] >= 3) {
-                    whiteQuadScore += temp[Board.WHITE];
+            }
+        }
+
+        //white
+        iStart = (int) Math.max(0, board.centerOfMass[Board.WHITE][0] - 2);
+        iEnd = (int) Math.min(dim-2, board.centerOfMass[Board.WHITE][0] + 2);
+        jStart = (int) Math.max(0, board.centerOfMass[Board.WHITE][1] - 2);
+        jEnd = (int) Math.min(dim-2, board.centerOfMass[Board.WHITE][1] + 2);
+
+        for (int i=iStart; i<=iEnd; i++) {
+            for (int j=jStart; j<=jEnd; j++) {
+                temp = new int[3];
+
+                //count the number of pieces of each type in the quad starting from (i, j) and ending in (i+1, j+1)
+                temp[board.board[i][j]]++;
+                temp[board.board[i+1][j]]++;
+                temp[board.board[i][j+1]]++;
+                temp[board.board[i+1][j+1]]++;
+
+                if (temp[Board.WHITE] >= 3) {
+                    whiteQuadScore++;
                 }
             }
         }
@@ -160,25 +143,25 @@ public class Evaluator {
     
     private double getDensityScore() {
         double[] scores = new double[3];
-        
+
         for (int i=0; i<dim; i++) {
             for (int j=0; j<dim; j++) {
                 if (board.board[i][j] != Board.EMPTY) {
                     int color = board.board[i][j];
-                    double rowDist = Math.pow(i - board.centerOfMass[color][0], 2);
-                    double colDist = Math.pow(j - board.centerOfMass[color][1], 2);
-                    scores[color] += Math.sqrt(rowDist + colDist);
+                    double rowDist = Math.abs(i - board.centerOfMass[color][0]);
+                    double colDist = Math.abs(j - board.centerOfMass[color][1]);
+                    scores[color] += rowDist + colDist;
                 }
             }
         }
-        
+
         scores[Board.BLACK] /= board.pieceCount[Board.BLACK];
         scores[Board.WHITE] /= board.pieceCount[Board.WHITE];
-        
+
         return scores[Board.WHITE] - scores[Board.BLACK]; //less avg distance preferable
     }
 
-    public double evaluate(Board board, int color) {
+    double evaluate(Board board, int color) {
         this.board = board;
         this.dim = board.getDim();
 

@@ -16,6 +16,10 @@ public class Board {
     public int[] pieceCount, rowCount, colCount, rdiagCount, ldiagCount;
     public double[][] centerOfMass;
 
+    //positional value
+    double[][] pst;
+    public double[] positionalScores;
+
     //zobrist hashing
     int[][][] keys = null;
     int hashValue;
@@ -79,6 +83,11 @@ public class Board {
         centerOfMass = new double[3][2];
         centerOfMass[BLACK][0] = centerOfMass[BLACK][1] = centerOfMass[WHITE][0] = centerOfMass[WHITE][1] = (dim - 1) / 2.0;
 
+        //pst
+        setPst(dim);
+        positionalScores = new double[3];
+        positionalScores[BLACK] = positionalScores[WHITE] = dim == 8 ? -260 : -140;
+
         moveOf = BLACK;
         moveCount = 0;
 
@@ -120,7 +129,40 @@ public class Board {
         centerOfMass[WHITE][0] = b.centerOfMass[WHITE][0];
         centerOfMass[WHITE][1] = b.centerOfMass[WHITE][1];
 
+        //pst
+        setPst(dim);
+        positionalScores = new double[3];
+        positionalScores[BLACK] = b.positionalScores[BLACK];
+        positionalScores[WHITE] = b.positionalScores[WHITE];
+
         copyHash(b);
+    }
+
+    private void setPst(int dim) {
+        if (dim == 8) {
+            double[][] temp = {
+                    {-80, -25, -20, -20, -20, -20, -25, -80},
+                    {-25,  10,  10,  10,  10,  10,  10, -25},
+                    {-20,  10,  25,  25,  25,  25,  10, -20},
+                    {-20,  10,  25,  50,  50,  25,  10, -20},
+                    {-20,  10,  25,  50,  50,  25,  10, -20},
+                    {-20,  10,  25,  25,  25,  25,  10, -20},
+                    {-25,  10,  10,  10,  10,  10,  10, -25},
+                    {-80, -25, -20, -20, -20, -20, -25, -80}
+            };
+            pst = temp;
+        }
+        else if (dim == 6) {
+            double[][] temp = {
+                    {-60, -20, -15,  -15, -20, -60},
+                    {-20,  20,  20,   20,  20, -20},
+                    {-15,  20,  40,   40,  20, -15},
+                    {-15,  20,  40,   40,  20, -15},
+                    {-20,  20,  20,   20,  20, -20},
+                    {-60, -20, -15,  -15, -20, -60}
+            };
+            pst = temp;
+        }
     }
 
     public Board move(String from, String to) {
@@ -149,6 +191,9 @@ public class Board {
             centerOfMass[opponent][0] /= pieceCount[opponent];
             centerOfMass[opponent][1] /= pieceCount[opponent];
 
+            //update positional score
+            positionalScores[opponent] -= pst[ret.get(0)][ret.get(1)];
+
             //update hash code -> remove opponent's piece from (to)
             hashValue ^= keys[ret.get(0)][ret.get(1)][opponent];
         }
@@ -163,6 +208,9 @@ public class Board {
         centerOfMass[moveOf][0] += (1.0 * ret.get(0)) / pieceCount[moveOf];
         centerOfMass[moveOf][1] += (1.0 * ret.get(1)) / pieceCount[moveOf];
 
+        //update positional score
+        positionalScores[moveOf] += pst[ret.get(0)][ret.get(1)];
+
         //update hash code -> add mover's piece to (to)
         hashValue ^= keys[ret.get(0)][ret.get(1)][moveOf];
 
@@ -175,6 +223,9 @@ public class Board {
         //subtract the old positions from the center of mass of the moving piece
         centerOfMass[moveOf][0] -= (1.0 * ret.get(0)) / pieceCount[moveOf];
         centerOfMass[moveOf][1] -= (1.0 * ret.get(1)) / pieceCount[moveOf];
+
+        //update positional score
+        positionalScores[moveOf] -= pst[ret.get(0)][ret.get(1)];
 
         //update hash code -> remove mover's piece from (from)
         hashValue ^= keys[ret.get(0)][ret.get(1)][moveOf];
@@ -459,10 +510,6 @@ public class Board {
         return dim;
     }
 
-    public int[][] getBoard() {
-        return board;
-    }
-
     public void printBoard() {
         System.out.print(" ");
         for (int i=0; i<dim; i++) {
@@ -482,27 +529,6 @@ public class Board {
             System.out.println();
             System.out.println("   --------------------------------");
         }
-
-        //System.out.println("Hash: " + hashValue);
-
-        /*System.out.println("Center of masses:");
-        System.out.println("\tBlack: (" + centerOfMass[BLACK][0] + ", " + centerOfMass[BLACK][1] + ")");
-        System.out.println("\tWhite: (" + centerOfMass[WHITE][0] + ", " + centerOfMass[WHITE][1] + ")");*/
-
-        /*System.out.println("counts");
-        System.out.println("row---");
-        for (int i=0; i<dim; i++)
-            System.out.print(rowCount[i] + " ");
-        System.out.println("\ncol---");
-        for (int i=0; i<dim; i++)
-            System.out.print(colCount[i] + " ");
-        System.out.println("\nrdiag---");
-        for (int i=0; i<2*dim-1; i++)
-            System.out.print(rdiagCount[i] + " ");
-        System.out.println("\nldiag---");
-        for (int i=0; i<2*dim-1; i++)
-            System.out.print(ldiagCount[i] + " ");
-        System.out.println();*/
     }
 
     private void initKeys() {
