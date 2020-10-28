@@ -5,20 +5,18 @@ import Mechanics.*;
 import java.util.*;
 
 public class AI {
-    public final static double INF = 100000;
-    private final double eps = .00001;
-    double scoreCutOff = INF / 2;
+    private final static double INF = 100000;
+    private final static double EPS = .00001;
+    private final double CUT_OFF = INF / 2;
 
-    int dim;
-    int currentDepth;
-    int maxDepth;
-    double timeLimit, startTime;
-    Evaluator evaluator;
-    boolean timeUp = false;
+    private int dim;
+    private int currentDepth;
+    private int maxDepth;
+    private double timeLimit, startTime;
+    private Evaluator evaluator;
+    private boolean timeUp = false;
 
-    double nodesVisited;
-
-    List<Move> moveList; //list of moves sorted on current depth
+    private double nodesVisited;
 
     public AI(int dim) {
         this.dim = dim;
@@ -32,11 +30,11 @@ public class AI {
         this.evaluator.setCoefficients(pc, ac, mc, cc, qc, dc);
     }
 
-    public double evaluate(Board board, int color) {
+    private double evaluate(Board board, int color) {
         return evaluator.evaluate(board, color);
     }
 
-    double minimax(Board board, int color, int depth, double alpha, double beta) {
+    private double minimax(Board board, int color, int depth, double alpha, double beta) {
         double score = evaluate(board, color);
         nodesVisited++;
 
@@ -60,15 +58,15 @@ public class AI {
             //maximize
             score = -2 * INF;
 
-            for (int i=0; i<moveList.size(); i++) {
+            for (Move m :moveList) {
                 temp = new Board(board);
-                temp.move(moveList.get(i));
+                temp.move(m);
 
                 double score2 = minimax(temp, color, depth-1, alpha, beta);
                 if (score2 > score) {
                     score = score2;
                 }
-                else if (Math.abs(score2 - score) < eps) {
+                else if (Math.abs(score2 - score) < EPS) {
                     if (random.nextBoolean()) {
                         score = score2;
                     }
@@ -84,15 +82,15 @@ public class AI {
             //minimize
             score = 2 * INF;
 
-            for (int i=0; i<moveList.size(); i++) {
+            for (Move m :moveList) {
                 temp = new Board(board);
-                temp.move(moveList.get(i));
+                temp.move(m);
 
                 double score2 = minimax(temp, color, depth-1, alpha, beta);
                 if (score2 < score) {
                     score = score2;
                 }
-                else if (Math.abs(score2 - score) < eps) {
+                else if (Math.abs(score2 - score) < EPS) {
                     if (random.nextBoolean()) {
                         score = score2;
                     }
@@ -109,7 +107,6 @@ public class AI {
     }
 
     public Move getMove(Board board) {
-        Move best = null;
         double score;
         int color = board.moveOf;
 
@@ -119,8 +116,10 @@ public class AI {
 
         Board temp;
 
-        moveList = board.getAllAvailableMoves(color);
+        List<Move> moveList = board.getAllAvailableMoves(color);
         MoveComparator moveComparator = new MoveComparator();
+
+        Move best = moveList.get(0);
 
         startTime = System.currentTimeMillis();
         timeUp = false;
@@ -129,13 +128,12 @@ public class AI {
         for (currentDepth = 1; currentDepth <= maxDepth && !timeUp; currentDepth++) {
             score = -2 * INF;
 
-            for (int i=0; i<moveList.size(); i++) {
+            for (Move m : moveList) {
                 if (System.currentTimeMillis()-startTime > timeLimit) {
                     timeUp = true;
                     break;
                 }
 
-                Move m = moveList.get(i);
                 temp = new Board(board);
                 temp.move(m);
 
@@ -150,7 +148,7 @@ public class AI {
                     score = score2;
                     best = m;
                 }
-                else if (Math.abs(score2 - score) < eps) {
+                else if (Math.abs(score2 - score) < EPS) {
                     if (random.nextBoolean()) {
                         score = score2;
                         best = m;
@@ -159,7 +157,7 @@ public class AI {
             }
 
             if (!timeUp) {
-                System.out.println("At depth: " + currentDepth + ", Score: " + best.getscore());
+                System.out.println("At depth: " + currentDepth + ", Score: " + best.getScore());
             }
             else {
                 System.out.println("Time up before ending: " + currentDepth);
@@ -167,12 +165,12 @@ public class AI {
 
             completedDepth = currentDepth;
 
-            if (best.getscore() > scoreCutOff) break;
+            if (best.getScore() > CUT_OFF) break;
 
-            Collections.sort(moveList, moveComparator);
+            moveList.sort(moveComparator);
         }
 
-        System.out.println("Found at " + completedDepth + " score: " + best.getscore());
+        System.out.println("Found at " + completedDepth + " score: " + best.getScore());
         System.out.println("Time needed: " + (System.currentTimeMillis()-startTime));
         System.out.println("Nodes visited: " + nodesVisited);
 

@@ -2,6 +2,9 @@ package FX;
 
 import Mechanics.Board;
 import Mechanics.Move;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -11,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import Main.Main;
 import AI.AI;
@@ -19,39 +23,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoardFX {
-    Group root;
-    Cell[][] cells;
+    private Group root;
+    private Cell[][] cells;
     Board board;
-    Main main;
-    int dim;
+    private Main main;
+    private int dim;
 
     double baseX, baseY; //base of every other coordinate
-    int size = 100; //size of cells
+    private int size = 100; //size of cells
 
-    int type; //single or multi
-    int playerColor; //in singleplayer
+    private int type; //single or multi
 
     int state = 0; //0 means src to be selected, 1 means dst to be selected, 2 means ai to move, 3 means game over
 
-    List<Pair<Integer, Integer>> moves; //list of available moves when state = 1
-    List<Line> srcLines; //list of current lines, when state = 1
-    Line destLine; //line when state = 0
+    private List<Pair<Integer, Integer>> moves; //list of available moves when state = 1
+    private List<Line> srcLines; //list of current lines, when state = 1
+    private Line destLine; //line when state = 0
 
-    Pair<Integer, Integer> from;
+    private Pair<Integer, Integer> from;
 
-    Button back;
+    private Text gameStatus, aiStatus;
 
-    Text gameStatus, aiStatus;
-    List<Text> labels;
-
-    AI ai;
+    private AI ai;
 
     public BoardFX(int type, int dim, int color, Main main) {
         this.main = main;
         this.type = type;
         this.board = new Board(dim);
         this.dim = dim;
-        this.playerColor = color;
 
         this.baseX = dim == 8 ? 270 : 370;
         this.baseY = dim == 8 ? 800 : 700;
@@ -74,7 +73,7 @@ public class BoardFX {
         gameStatus.setY(baseY + 1.8 * size);
         gameStatus.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 26));
 
-        back = new Button("Go back");
+        Button back = new Button("Go back");
         back.setMinSize(80, 40);
         back.setLayoutX(baseX + dim * size + 50);
         back.setLayoutY(baseY - dim * size + dim);
@@ -90,7 +89,7 @@ public class BoardFX {
         }
         else {
             ai = new AI(dim);
-            ai.setCoefficients(1, 0, 5, 10, 0, 1);
+            ai.setCoefficients(1, 0, .7, 5, 4, 7);
             
             aiStatus = new Text();
             aiStatus.setText("Thinking.....");
@@ -103,7 +102,7 @@ public class BoardFX {
             aiStatus.setVisible(false);
             root.getChildren().add(aiStatus);
 
-            if (playerColor == Board.BLACK) {
+            if (color == Board.BLACK) {
                 state = 0;
             }
             else {
@@ -114,7 +113,7 @@ public class BoardFX {
         }
     }
 
-    public void setFrom(int row, int col) {
+    void setFrom(int row, int col) {
         from = new Pair<>(row, col);
 
         moves = board.getAvailableMoves(row, col);
@@ -146,7 +145,7 @@ public class BoardFX {
         }
     }
 
-    public void move(int destRow, int destCol) {
+    void move(int destRow, int destCol) {
         this.board.move(new Move(board.moveOf, from, new Pair<>(destRow, destCol)));
 
         //clear previous line
@@ -171,7 +170,7 @@ public class BoardFX {
         if (board.getResult() != 0) {
             this.state = 3; //game over
             gameStatus.setFont(Font.font(50));
-            gameStatus.setText((board.getResult() == board.BLACK ? "Black" : "White") + " won!!!!");
+            gameStatus.setText((board.getResult() == Board.BLACK ? "Black" : "White") + " won!!!!");
             gameStatus.setFill(Color.RED);
             gameStatus.setStroke(Color.BLACK);
             gameStatus.setX(baseX + (dim/2 - 1) * size);
@@ -180,10 +179,16 @@ public class BoardFX {
             if (type == Main.SINGLEPLAYER) {
                 aiStatus.setVisible(false);
             }
+
+            //blink the result
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.4), evt -> gameStatus.setVisible(false)),
+                    new KeyFrame(Duration.seconds(0.8), evt -> gameStatus.setVisible(true)));
+            timeline.setCycleCount(Animation.INDEFINITE);
+            timeline.play();
         }
         else {
-            gameStatus.setText("Move of: " + (board.moveOf == board.BLACK ? "Black" : "White"));
-            if (board.moveOf == board.BLACK) {
+            gameStatus.setText("Move of: " + (board.moveOf == Board.BLACK ? "Black" : "White"));
+            if (board.moveOf == Board.BLACK) {
                 gameStatus.setFill(Color.BLACK);
             }
             else {
@@ -192,7 +197,6 @@ public class BoardFX {
             }
 
             if (type == Main.SINGLEPLAYER) {
-                System.out.println("state = " + state);
                 if (state != 2) {
                     state = 2;
                     aiStatus.setVisible(true);
@@ -206,8 +210,7 @@ public class BoardFX {
         }
     }
 
-    public void setUpLabels() {
-        labels = new ArrayList<>();
+    private void setUpLabels() {
         Text temp1, temp2;
 
         //set cols
@@ -222,7 +225,6 @@ public class BoardFX {
             temp1.setY(y1); temp2.setY(y2);
             temp1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
             temp2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
-            labels.add(temp1); labels.add(temp2);
             root.getChildren().addAll(temp1, temp2);
             c++;
             x += size;
@@ -240,14 +242,13 @@ public class BoardFX {
             temp1.setY(y); temp2.setY(y);
             temp1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
             temp2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
-            labels.add(temp1); labels.add(temp2);
             root.getChildren().addAll(temp1, temp2);
             c++;
             y -= size;
         }
     }
 
-    public void setState(int state) {
+    void setState(int state) {
         this.state = state;
 
         if (state == 0) {
@@ -257,13 +258,13 @@ public class BoardFX {
             }
             moves.clear();
 
-            for (int i=0; i<srcLines.size(); i++) {
-                root.getChildren().remove(srcLines.get(i));
+            for (Line srcLine : srcLines) {
+                root.getChildren().remove(srcLine);
             }
         }
     }
 
-    public void aiMove() {
+    private void aiMove() {
         new Thread(() -> {
             Move move = ai.getMove(board);
             from = new Pair<>(move.srcRow, move.srcCol);
@@ -276,7 +277,7 @@ public class BoardFX {
         main.goBack(1);
     }
 
-    public void loadBoard() {
+    private void loadBoard() {
         for (int i=0; i<dim; i++) {
             for (int j=0; j<dim; j++) {
                 cells[i][j].setVal(board.board[i][j]);

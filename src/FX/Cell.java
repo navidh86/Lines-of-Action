@@ -5,31 +5,28 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
-public class Cell {
+class Cell {
     final static int EMPTY = 0;
     final static int BLACK = 1;
     final static int WHITE = 2;
 
-    static double xOffset, yOffset;
-
-    int size = 100;
-    int row, col;
+    private int size = 100;
+    private int row, col;
     double x, y;
-    int val; //1 black, 2 white
+    private int val; //1 black, 2 white
 
-    Circle circle;
-    Rectangle rectangle;
-    StackPane sp;
+    private Circle circle;
+    private StackPane sp;
 
-    BoardFX parent;
+    private BoardFX parent;
 
-    int state = 0; //1 means this cell is a dest currently
+    private int state = 0; //1 means this cell is a dest currently
 
     Cell(int row, int col, BoardFX parent) {
         this.parent = parent;
 
-        xOffset = parent.baseX;
-        yOffset = parent.baseY;
+        double xOffset = parent.baseX;
+        double yOffset = parent.baseY;
 
         this.row = row;
         this.col = col;
@@ -42,11 +39,11 @@ public class Cell {
         setVal(0);
     }
 
-    public StackPane getObject() {
+    StackPane getObject() {
         return sp;
     }
 
-    public void setVal(int val) {
+    void setVal(int val) {
         if (this.val != val) {
             this.val = val;
             setCircle(val);
@@ -58,7 +55,7 @@ public class Cell {
         sp.setLayoutX(x);
         sp.setLayoutY(y);
 
-        rectangle = new Rectangle();
+        Rectangle rectangle = new Rectangle();
         rectangle.setHeight(size);
         rectangle.setWidth(size);
         if ((row+col) % 2 == 0) {
@@ -72,7 +69,7 @@ public class Cell {
         sp.setOnMouseClicked(e -> handleClick());
     }
 
-    public void createCircle() {
+    private void createCircle() {
         circle = new Circle();
         circle.setCenterX(size/2);
         circle.setCenterY(size/2);
@@ -81,7 +78,7 @@ public class Cell {
         sp.getChildren().add(circle);
     }
 
-    public void setCircle(int val) {
+    private void setCircle(int val) {
         if (val != EMPTY) {
             circle.setDisable(false);
             circle.setVisible(true);
@@ -100,7 +97,7 @@ public class Cell {
         }
     }
 
-    public void handleClick() {
+    private void handleClick() {
         if (parent.state == 0) {
             if (val == parent.board.moveOf) {
                 parent.setState(1);
@@ -116,7 +113,7 @@ public class Cell {
         }
     }
 
-    public void setState(int state) {
+    void setState(int state) {
         this.state = state;
     }
 }

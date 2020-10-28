@@ -2,8 +2,6 @@ package Mechanics;
 
 import javafx.util.Pair;
 
-import java.util.Comparator;
-
 public class Move {
     public int srcRow, srcCol, destRow, destCol, moveBy;
     double score = 0;
@@ -38,7 +36,7 @@ public class Move {
         this.score = s;
     }
 
-    public double getscore() {
+    public double getScore() {
         return score;
     }
 

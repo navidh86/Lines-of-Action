@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 import FX.*;
 
 public class Main extends Application {
-    final int NUMBER_OF_SCENES = 4;
+    private final int NUMBER_OF_SCENES = 4;
 
     public final static int CHOOSE_TYPE = 0; //single player of multiplayer
     public final static int CHOOSE_SIZE = 1;
@@ -18,14 +18,13 @@ public class Main extends Application {
     public final static int BLACK = 1, WHITE = 2;
 
     //choices
-    int type = SINGLEPLAYER;
-    int size = 8;
-    int color = BLACK;
+    private int type = SINGLEPLAYER;
+    private int size = 8;
+    private int color = BLACK;
 
-    Scene[] scenes;
-    BoardFX bfx;
+    private Scene[] scenes;
 
-    Stage primaryStage;
+    private Stage primaryStage;
 
     private void showScene(int screenIdx) {
         if (screenIdx != MAIN_GAME) {
@@ -34,8 +33,7 @@ public class Main extends Application {
             }
         }
         else {
-            bfx = new BoardFX(type, size, color, this);
-            scenes[screenIdx] = new Scene(bfx.getRoot(), 1300, 1000);
+            scenes[screenIdx] = new Scene(new BoardFX(type, size, color, this).getRoot(), 1300, 1000);
         }
 
         scenes[screenIdx].setFill(Color.rgb(90, 120, 70));
@@ -80,7 +78,6 @@ public class Main extends Application {
 
         showScene(CHOOSE_TYPE);
     }
-
 
     public static void main(String[] args) {
         launch(args);

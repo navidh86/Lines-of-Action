@@ -1,21 +1,19 @@
 package FX;
 
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import Main.Main;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 public class ChoiceScreen {
-    Group root;
-    Main main;
-    Button choice1, choice2, back;
-    Text text;
-    int type;
+    private Group root;
+    private Main main;
+    private Button choice1, choice2;
+    private Text text;
+    private int type;
 
     public ChoiceScreen(int type, Main main) {
         this.main = main;
@@ -24,7 +22,7 @@ public class ChoiceScreen {
         root = new Group();
         
         text = new Text();
-        text.setX(400);
+        text.setX(410);
         text.setY(370);
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
         root.getChildren().add(text);
@@ -46,7 +44,7 @@ public class ChoiceScreen {
             choice2 = new Button("Multiplayer");
         }
         else if (type == Main.CHOOSE_COLOR) {
-            text.setText("Choose color");
+            text.setText("      Choose color");
 
             choice1 = new Button("Black");
             choice2 = new Button("White");
@@ -59,7 +57,7 @@ public class ChoiceScreen {
         choice1.setLayoutY(400);
         choice2.setLayoutY(550);
 
-        back = new Button("Go back");
+        Button back = new Button("Go back");
         back.setMinSize(80, 40);
         back.setLayoutX(800);
         back.setLayoutY(200);
