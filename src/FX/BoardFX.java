@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -38,7 +39,9 @@ public class BoardFX {
 
     private List<Pair<Integer, Integer>> moves; //list of available moves when state = 1
     private List<Line> srcLines; //list of current lines, when state = 1
+    private List<Circle> srcCircles; //list of current circles, when state = 1
     private Line destLine; //line when state = 0
+    private Circle destCircle; //circle when state = 0
 
     private Pair<Integer, Integer> from;
 
@@ -125,38 +128,63 @@ public class BoardFX {
         }
 
         srcLines = new ArrayList<>();
+        srcCircles = new ArrayList<>();
 
-        Line temp;
+        Line tempLine;
+        Circle tempCircle;
+        
         for (int i=0; i<moves.size(); i++) {
             //draw a line to that cell
-            temp = new Line();
-            temp.setStartX(cells[row][col].x + 50);
-            temp.setStartY(cells[row][col].y + 50);
-            temp.setEndX(cells[moves.get(i).getKey()][moves.get(i).getValue()].x + 50);
-            temp.setEndY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + 50);
-            temp.setStrokeWidth(4);
-            temp.setStroke(Color.RED);
-            temp.setMouseTransparent(true);
-            srcLines.add(temp);
-            root.getChildren().add(temp);
+            tempLine = new Line();
+            tempLine.setStartX(cells[row][col].x + 50);
+            tempLine.setStartY(cells[row][col].y + 50);
+            tempLine.setEndX(cells[moves.get(i).getKey()][moves.get(i).getValue()].x + 50);
+            tempLine.setEndY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + 50);
+            tempLine.setStrokeWidth(4);
+            tempLine.setStroke(Color.RED);
+            tempLine.setMouseTransparent(true);
+            srcLines.add(tempLine);
+
+            tempCircle = new Circle();
+            tempCircle.setCenterX(cells[moves.get(i).getKey()][moves.get(i).getValue()].x + 50);
+            tempCircle.setCenterY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + 50);
+            tempCircle.setRadius(5);
+            tempCircle.setFill(Color.RED);
+            tempCircle.setMouseTransparent(true);
+            srcCircles.add(tempCircle);
 
             //set the state of that cell to 1
             cells[moves.get(i).getKey()][moves.get(i).getValue()].setState(1);
         }
+
+        //add a small circle in the 'from' cell
+        tempCircle = new Circle();
+        tempCircle.setCenterX(cells[row][col].x + 50);
+        tempCircle.setCenterY(cells[row][col].y + 50);
+        tempCircle.setRadius(6.5);
+        tempCircle.setFill(Color.RED);
+        tempCircle.setMouseTransparent(true);
+        srcCircles.add(tempCircle);
+        
+        root.getChildren().addAll(srcLines);
+        root.getChildren().addAll(srcCircles);
     }
 
     void move(int destRow, int destCol) {
         this.board.move(new Move(board.moveOf, from, new Pair<>(destRow, destCol)));
 
-        //clear previous line
+        //clear previous line and circle
         if (destLine != null) {
             root.getChildren().remove(destLine);
+            root.getChildren().remove(destCircle);
         }
 
         //update cells on fx
         cells[from.getKey()][from.getValue()].setVal(Cell.EMPTY);
         cells[destRow][destCol].setVal(3 - board.moveOf);
 
+        //add new dest line and circle
+        //line
         destLine = new Line();
         destLine.setStartX(cells[from.getKey()][from.getValue()].x + 50);
         destLine.setStartY(cells[from.getKey()][from.getValue()].y + 50);
@@ -165,7 +193,17 @@ public class BoardFX {
         destLine.setStrokeWidth(3);
         destLine.setStroke(Color.BLUE);
         destLine.setMouseTransparent(true);
-        root.getChildren().add(destLine);
+
+        //circle
+        destCircle = new Circle();
+        destCircle.setCenterX(cells[destRow][destCol].x + 50);
+        destCircle.setCenterY(cells[destRow][destCol].y + 50);
+        destCircle.setRadius(5);
+        destCircle.setFill(Color.BLUE);
+        destCircle.setMouseTransparent(true);
+
+        //add them
+        root.getChildren().addAll(destLine, destCircle);
 
         if (board.getResult() != 0) {
             this.state = 3; //game over
@@ -258,9 +296,9 @@ public class BoardFX {
             }
             moves.clear();
 
-            for (Line srcLine : srcLines) {
-                root.getChildren().remove(srcLine);
-            }
+            //remove the src lines and circle
+            root.getChildren().removeAll(srcLines);
+            root.getChildren().removeAll(srcCircles);
         }
     }
 
