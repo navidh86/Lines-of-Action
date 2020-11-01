@@ -14,16 +14,21 @@ public class ChoiceScreen {
     private Button choice1, choice2;
     private Text text;
     private int type;
+    private double baseX, baseY;
+    private final double btnWidth = 150, btnHeight = 60;
 
     public ChoiceScreen(int type, Main main) {
         this.main = main;
         this.type = type;
 
+        this.baseX = (Main.width - btnWidth) / 2;
+        this.baseY = (Main.height - btnHeight * 2) / 2;
+
         root = new Group();
         
         text = new Text();
-        text.setX(410);
-        text.setY(370);
+        text.setX(baseX - btnWidth / 2);
+        text.setY(baseY - btnHeight);
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
         root.getChildren().add(text);
         
@@ -50,17 +55,17 @@ public class ChoiceScreen {
             choice2 = new Button("White");
         }
 
-        choice1.setMinSize(150, 80);
-        choice2.setMinSize(150, 80);
-        choice1.setLayoutX(500);
-        choice2.setLayoutX(500);
-        choice1.setLayoutY(400);
-        choice2.setLayoutY(550);
+        choice1.setMinSize(btnWidth, btnHeight);
+        choice2.setMinSize(btnWidth, btnHeight);
+        choice1.setLayoutX(baseX);
+        choice2.setLayoutX(baseX);
+        choice1.setLayoutY(baseY);
+        choice2.setLayoutY(baseY  + 2 * btnHeight);
 
         Button back = new Button("Go back");
-        back.setMinSize(80, 40);
-        back.setLayoutX(800);
-        back.setLayoutY(200);
+        back.setMinSize(btnWidth/2, btnHeight/2);
+        back.setLayoutX(baseX + btnWidth * 1.5);
+        back.setLayoutY(baseY - btnHeight * 3);
 
         if (type == Main.CHOOSE_TYPE) {
             //nowhere to go back to

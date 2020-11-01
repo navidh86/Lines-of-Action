@@ -10,7 +10,7 @@ class Cell {
     final static int BLACK = 1;
     final static int WHITE = 2;
 
-    private int size = 100;
+    private double size;
     private int row, col;
     double x, y;
     private int val; //1 black, 2 white
@@ -33,6 +33,7 @@ class Cell {
 
         this.row = row;
         this.col = col;
+        this.size = parent.size;
         this.x = xOffset + (col * size);
         this.y = yOffset - (row * size);
         this.val = -1;
@@ -76,7 +77,7 @@ class Cell {
         circle = new Circle();
         circle.setCenterX(size/2);
         circle.setCenterY(size/2);
-        circle.setRadius(35);
+        circle.setRadius(size*.35);
         circle.setStrokeWidth(3);
         sp.getChildren().add(circle);
     }

@@ -3,6 +3,7 @@ package Main;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import FX.*;
 
@@ -17,6 +18,9 @@ public class Main extends Application {
     public final static int SINGLEPLAYER = 0, MULTIPLAYER = 1;
     public final static int BLACK = 1, WHITE = 2;
 
+    public final static double width = Screen.getPrimary().getVisualBounds().getWidth();
+    public final static double height = Screen.getPrimary().getVisualBounds().getHeight();
+
     //choices
     private int type = SINGLEPLAYER;
     private int size = 8;
@@ -29,11 +33,11 @@ public class Main extends Application {
     private void showScene(int screenIdx) {
         if (screenIdx != MAIN_GAME) {
             if (scenes[screenIdx] == null) {
-                scenes[screenIdx] = new Scene(new ChoiceScreen(screenIdx, this).getRoot(), 1300, 1000);
+                scenes[screenIdx] = new Scene(new ChoiceScreen(screenIdx, this).getRoot(), width, height);
             }
         }
         else {
-            scenes[screenIdx] = new Scene(new BoardFX(type, size, color, this).getRoot(), 1300, 1000);
+            scenes[screenIdx] = new Scene(new BoardFX(type, size, color, this).getRoot(), width, height);
         }
 
         scenes[screenIdx].setFill(Color.rgb(90, 120, 70));

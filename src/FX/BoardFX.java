@@ -31,7 +31,7 @@ public class BoardFX {
     private int dim;
 
     double baseX, baseY; //base of every other coordinate
-    private int size = 100; //size of cells
+    double size; //size of cells
 
     private int type; //single or multi
 
@@ -55,8 +55,9 @@ public class BoardFX {
         this.board = new Board(dim);
         this.dim = dim;
 
-        this.baseX = dim == 8 ? 270 : 370;
-        this.baseY = dim == 8 ? 800 : 700;
+        this.size = Math.floor(Main.height / 100) * 10;
+        this.baseX = (Main.width - dim * size) / 2;
+        this.baseY = (Main.height - dim * size) / 2 + (dim-1.1) * size;
 
         root = new Group();
 
@@ -78,8 +79,8 @@ public class BoardFX {
 
         Button back = new Button("Go back");
         back.setMinSize(80, 40);
-        back.setLayoutX(baseX + dim * size + 50);
-        back.setLayoutY(baseY - dim * size + dim);
+        back.setLayoutX(baseX + dim * size + size/2);
+        back.setLayoutY(baseY - dim * size + size/3);
         back.setOnMouseClicked(e -> goBack());
 
         root.getChildren().addAll(gameStatus, back);
@@ -92,7 +93,7 @@ public class BoardFX {
         }
         else {
             ai = new AI(dim);
-            ai.setCoefficients(1, 0, .7, 5, 4, 7);
+            ai.setCoefficients(1, 0, .7, 5, 2, 7);
             
             aiStatus = new Text();
             aiStatus.setText("Thinking.....");
@@ -132,23 +133,24 @@ public class BoardFX {
 
         Line tempLine;
         Circle tempCircle;
-        
+        double offset = size/2;
+
         for (int i=0; i<moves.size(); i++) {
             //draw a line to that cell
             tempLine = new Line();
-            tempLine.setStartX(cells[row][col].x + 50);
-            tempLine.setStartY(cells[row][col].y + 50);
-            tempLine.setEndX(cells[moves.get(i).getKey()][moves.get(i).getValue()].x + 50);
-            tempLine.setEndY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + 50);
+            tempLine.setStartX(cells[row][col].x + offset);
+            tempLine.setStartY(cells[row][col].y + offset);
+            tempLine.setEndX(cells[moves.get(i).getKey()][moves.get(i).getValue()].x + offset);
+            tempLine.setEndY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + offset);
             tempLine.setStrokeWidth(4);
             tempLine.setStroke(Color.RED);
             tempLine.setMouseTransparent(true);
             srcLines.add(tempLine);
 
             tempCircle = new Circle();
-            tempCircle.setCenterX(cells[moves.get(i).getKey()][moves.get(i).getValue()].x + 50);
-            tempCircle.setCenterY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + 50);
-            tempCircle.setRadius(5);
+            tempCircle.setCenterX(cells[moves.get(i).getKey()][moves.get(i).getValue()].x + offset);
+            tempCircle.setCenterY(cells[moves.get(i).getKey()][moves.get(i).getValue()].y + offset);
+            tempCircle.setRadius(.05 * size);
             tempCircle.setFill(Color.RED);
             tempCircle.setMouseTransparent(true);
             srcCircles.add(tempCircle);
@@ -159,9 +161,9 @@ public class BoardFX {
 
         //add a small circle in the 'from' cell
         tempCircle = new Circle();
-        tempCircle.setCenterX(cells[row][col].x + 50);
-        tempCircle.setCenterY(cells[row][col].y + 50);
-        tempCircle.setRadius(6.5);
+        tempCircle.setCenterX(cells[row][col].x + offset);
+        tempCircle.setCenterY(cells[row][col].y + offset);
+        tempCircle.setRadius(.065 * size);
         tempCircle.setFill(Color.RED);
         tempCircle.setMouseTransparent(true);
         srcCircles.add(tempCircle);
@@ -183,22 +185,23 @@ public class BoardFX {
         cells[from.getKey()][from.getValue()].setVal(Cell.EMPTY);
         cells[destRow][destCol].setVal(3 - board.moveOf);
 
+        double offset = size/2;
         //add new dest line and circle
         //line
         destLine = new Line();
-        destLine.setStartX(cells[from.getKey()][from.getValue()].x + 50);
-        destLine.setStartY(cells[from.getKey()][from.getValue()].y + 50);
-        destLine.setEndX(cells[destRow][destCol].x + 50);
-        destLine.setEndY(cells[destRow][destCol].y + 50);
+        destLine.setStartX(cells[from.getKey()][from.getValue()].x + offset);
+        destLine.setStartY(cells[from.getKey()][from.getValue()].y + offset);
+        destLine.setEndX(cells[destRow][destCol].x + offset);
+        destLine.setEndY(cells[destRow][destCol].y + offset);
         destLine.setStrokeWidth(3);
         destLine.setStroke(Color.BLUE);
         destLine.setMouseTransparent(true);
 
         //circle
         destCircle = new Circle();
-        destCircle.setCenterX(cells[destRow][destCol].x + 50);
-        destCircle.setCenterY(cells[destRow][destCol].y + 50);
-        destCircle.setRadius(5);
+        destCircle.setCenterX(cells[destRow][destCol].x + offset);
+        destCircle.setCenterY(cells[destRow][destCol].y + offset);
+        destCircle.setRadius(.05 * size);
         destCircle.setFill(Color.BLUE);
         destCircle.setMouseTransparent(true);
 
@@ -254,7 +257,7 @@ public class BoardFX {
         //set cols
         char c = 'A';
         double x = baseX + size / 2;
-        double y1 = baseY - (dim-1) * size - 25, y2 = baseY + size + 40;
+        double y1 = baseY - (dim-1) * size - size/4, y2 = baseY + size + .4*size;
 
         for (int i=0; i<dim; i++) {
             temp1 = new Text(); temp2 = new Text();
@@ -270,7 +273,7 @@ public class BoardFX {
 
         //set rows
         c = '1';
-        double x1 = baseX - 40, x2 = baseX + dim * size + 35;
+        double x1 = baseX - .4*size, x2 = baseX + dim * size + .35*size;
         double y = baseY + (size/2);
 
         for (int i=0; i<dim; i++) {
