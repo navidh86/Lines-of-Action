@@ -6,7 +6,7 @@ import java.util.*;
 
 public class AI {
     private final static double INF = 100000;
-    private final static double EPS = .00001;
+    private final static double EPS = .001;
     private final double CUT_OFF = INF / 2;
 
     private int dim;
@@ -49,8 +49,6 @@ public class AI {
             return score;
         }
 
-        Random random = new Random(System.currentTimeMillis());
-
         Board temp;
         List<Move> moveList = board.getAllAvailableMoves(board.moveOf);
 
@@ -65,11 +63,6 @@ public class AI {
                 double score2 = minimax(temp, color, depth-1, alpha, beta);
                 if (score2 > score) {
                     score = score2;
-                }
-                else if (Math.abs(score2 - score) < EPS) {
-                    if (random.nextBoolean()) {
-                        score = score2;
-                    }
                 }
 
                 alpha = Math.max(alpha, score);
@@ -89,11 +82,6 @@ public class AI {
                 double score2 = minimax(temp, color, depth-1, alpha, beta);
                 if (score2 < score) {
                     score = score2;
-                }
-                else if (Math.abs(score2 - score) < EPS) {
-                    if (random.nextBoolean()) {
-                        score = score2;
-                    }
                 }
 
                 beta = Math.min(beta, score);

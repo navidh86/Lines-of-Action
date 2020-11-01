@@ -15,6 +15,9 @@ class Cell {
     double x, y;
     private int val; //1 black, 2 white
 
+    private Color darkColor = Color.rgb(129,130,134);
+    private Color lightColor = Color.rgb(205,206,208);
+
     private Circle circle;
     private StackPane sp;
 
@@ -59,10 +62,10 @@ class Cell {
         rectangle.setHeight(size);
         rectangle.setWidth(size);
         if ((row+col) % 2 == 0) {
-            rectangle.setFill(Color.rgb(222, 154, 66));
+            rectangle.setFill(darkColor);
         }
         else {
-            rectangle.setFill(Color.rgb(231, 186,162));
+            rectangle.setFill(lightColor);
         }
         sp.getChildren().add(rectangle);
 

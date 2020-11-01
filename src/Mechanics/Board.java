@@ -20,10 +20,6 @@ public class Board {
     double[][] pst;
     public double[] positionalScores;
 
-    //zobrist hashing
-    int[][][] keys = null;
-    int hashValue;
-
     public Board(int dim) {
         this.dim = dim;
         board = new int[dim][dim];
@@ -90,8 +86,6 @@ public class Board {
 
         moveOf = BLACK;
         moveCount = 0;
-
-        calculateHash();
     }
 
     public Board(Board b) {
@@ -134,8 +128,6 @@ public class Board {
         positionalScores = new double[3];
         positionalScores[BLACK] = b.positionalScores[BLACK];
         positionalScores[WHITE] = b.positionalScores[WHITE];
-
-        copyHash(b);
     }
 
     private void setPst(int dim) {
@@ -193,9 +185,6 @@ public class Board {
 
             //update positional score
             positionalScores[opponent] -= pst[ret.get(0)][ret.get(1)];
-
-            //update hash code -> remove opponent's piece from (to)
-            hashValue ^= keys[ret.get(0)][ret.get(1)][opponent];
         }
         else {
             rowCount[ret.get(0)]++;
@@ -211,9 +200,6 @@ public class Board {
         //update positional score
         positionalScores[moveOf] += pst[ret.get(0)][ret.get(1)];
 
-        //update hash code -> add mover's piece to (to)
-        hashValue ^= keys[ret.get(0)][ret.get(1)][moveOf];
-
         ret = getPos(from);
         rowCount[ret.get(0)]--;
         colCount[ret.get(1)]--;
@@ -227,16 +213,9 @@ public class Board {
         //update positional score
         positionalScores[moveOf] -= pst[ret.get(0)][ret.get(1)];
 
-        //update hash code -> remove mover's piece from (from)
-        hashValue ^= keys[ret.get(0)][ret.get(1)][moveOf];
-
         //update board array
         setColor(from, EMPTY);
         setColor(to, moveOf);
-
-        //update hash code -> change moveOf
-        hashValue ^= keys[moveOf][moveOf][0];
-        hashValue ^= keys[opponent][opponent][0]; //opponent's move now
 
         moveOf = opponent;
         moveCount++;
@@ -310,7 +289,7 @@ public class Board {
         return result;
     }
 
-    boolean isConnected(int color) {
+    private boolean isConnected(int color) {
         //check if all pieces of that color are connected using bfs
         int[] fr = {1, 1, 1, 0, -1, -1, -1, 0};
         int[] fc = {-1, 0, 1, 1, 1, 0, -1, -1};
@@ -323,6 +302,11 @@ public class Board {
             for (int j=0; j<dim; j++) {
                 if (board[i][j] == color && !vis[i][j]) {
                     cnt++;
+
+                    if (cnt > 1) {
+                        break;
+                    }
+
                     q = new LinkedList<>();
                     q.add(new Pair<>(i, j));
                     vis[i][j] = true;
@@ -529,91 +513,5 @@ public class Board {
             System.out.println();
             System.out.println("   --------------------------------");
         }
-    }
-
-    private void initKeys() {
-        keys = new int[dim][dim][3];
-        Random random = new Random(3333);
-
-        for (int i=0; i<dim; i++) {
-            for (int j=0; j<dim; j++) {
-                for (int k=BLACK; k<=WHITE; k++) {
-                    keys[i][j][k] = random.nextInt();
-                }
-            }
-        }
-        
-        keys[BLACK][BLACK][0] = random.nextInt(); //move of black
-        keys[WHITE][WHITE][0] = random.nextInt(); //move of white
-    }
-
-    private void calculateHash() {
-        initKeys();
-
-        hashValue = 0;
-
-        //positions
-        for (int i=0; i<dim; i++) {
-            for (int j=0; j<dim; j++) {
-                if (board[i][j] != EMPTY) {
-                    hashValue ^= keys[i][j][board[i][j]];
-                }
-            }
-        }
-
-        //move of
-        hashValue ^= keys[moveOf][moveOf][0];
-    }
-
-    private void copyHash(Board b) {
-        keys = new int[dim][dim][3];
-
-        for (int i=0; i<dim; i++) {
-            for (int j=0; j<dim; j++) {
-                for (int k=BLACK; k<=WHITE; k++) {
-                    keys[i][j][k] = b.keys[i][j][k];
-                }
-            }
-        }
-
-        keys[BLACK][BLACK][0] = b.keys[BLACK][BLACK][0]; //move of black
-        keys[WHITE][WHITE][0] = b.keys[WHITE][WHITE][0]; //move of white
-
-        this.hashValue = b.hashValue;
-    }
-
-    private String getBoardString() {
-        String ret = "" + moveOf;
-
-        for (int i=0; i<dim; i++) {
-            for (int j=0; j<dim; j++) {
-                ret += board[i][j];
-            }
-        }
-
-        return ret;
-    }
-
-    public boolean equals(Object o) {
-        Board board2 = (Board) o;
-
-        if (board2 == this)
-            return true;
-
-        if (moveOf != board2.moveOf)
-            return false;
-
-        for (int i=0; i<dim; i++) {
-            for (int j=0; j<dim; j++) {
-                if (board[i][j] != board2.board[i][j])
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    public int hashCode() {
-        return this.hashValue;
     }
 }

@@ -9,7 +9,7 @@ import FX.*;
 public class Main extends Application {
     private final int NUMBER_OF_SCENES = 4;
 
-    public final static int CHOOSE_TYPE = 0; //single player of multiplayer
+    public final static int CHOOSE_TYPE = 0; //single player or multiplayer
     public final static int CHOOSE_SIZE = 1;
     public final static int CHOOSE_COLOR = 2;
     public final static int MAIN_GAME = 3;
