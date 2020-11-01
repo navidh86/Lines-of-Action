@@ -115,6 +115,7 @@ public class AI {
 
         for (currentDepth = 1; currentDepth <= maxDepth && !timeUp; currentDepth++) {
             score = -2 * INF;
+            double alpha = -INF;
 
             for (Move m : moveList) {
                 if (System.currentTimeMillis()-startTime > timeLimit) {
@@ -125,7 +126,7 @@ public class AI {
                 temp = new Board(board);
                 temp.move(m);
 
-                double score2 = minimax(temp, color, currentDepth - 1, -INF, INF);
+                double score2 = minimax(temp, color, currentDepth - 1, alpha, INF);
 
                 if (timeUp) break;
 
@@ -142,6 +143,8 @@ public class AI {
                         best = m;
                     }
                 }
+
+                alpha = Math.max(alpha, score);
             }
 
             if (!timeUp) {
