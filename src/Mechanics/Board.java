@@ -158,8 +158,6 @@ public class Board {
     }
 
     public Board move(String from, String to) {
-        //check validity later
-
         int opponent = 3 - moveOf;
 
         List<Integer> ret = getPos(to);
@@ -284,6 +282,11 @@ public class Board {
             else {
                 result = WHITE;
             }
+        }
+
+        if (result == 0 && getAllAvailableMoves(moveOf).size() == 0) {
+            //if the current player to move has no valid moves, the other player wins
+            result = 3 - moveOf;
         }
 
         return result;
